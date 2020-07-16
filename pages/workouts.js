@@ -1,6 +1,5 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import ReactPlayer from 'react-player/lazy';
 import Layout, { siteTitle } from '../components/layout';
 import Date from '../components/date';
 import utilStyles from '../styles/utils.module.css';
@@ -15,18 +14,15 @@ export async function getStaticProps() {
   };
 }
 
-export default function Home({ allPostsData }) {
+export default function Workouts({ allPostsData }) {
   return (
     <>
       <Layout home>
         <Head>
           <title>{siteTitle}</title>
         </Head>
-        <section className={utilStyles.headingMd}>
-          <p>Welcome! Check out the courses and maps.</p>
-        </section>
         <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-          <h2 className={utilStyles.headingLg}>Disc Golf Courses</h2>
+          <h2 className={utilStyles.headingLg}>Workouts</h2>
           <ul className={utilStyles.list}>
             {allPostsData.map(({ id, date, title }) => (
               <li className={utilStyles.listItem} key={id}>
@@ -40,16 +36,6 @@ export default function Home({ allPostsData }) {
               </li>
             ))}
           </ul>
-          <h2 className={utilStyles.headingLg}>
-            2019 GBO TOP SHOTS | DISC GOLF HIGHLIGHT REEL
-          </h2>
-          <ReactPlayer
-            url='https://youtu.be/c-htzJXJnKk'
-            className='react-player'
-            width='100%'
-            height='30rem'
-            controls
-          />
         </section>
       </Layout>
     </>
