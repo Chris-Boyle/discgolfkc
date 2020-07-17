@@ -64,12 +64,10 @@ export default function NavBar() {
             TransitionComponent={Fade}
           >
             <MenuItem onClick={() => router.push('/')}>Home</MenuItem>
-            <MenuItem onClick={() => router.push('/workouts')}>
-              Workouts
-            </MenuItem>
+            <MenuItem onClick={() => router.push('/courses')}>Courses</MenuItem>
           </Menu>
           <Typography variant='h6' className={classes.title}>
-            HIIT KC
+            KC Disc Golf
           </Typography>
           <Button color='inherit' onClick={() => router.push('/contact')}>
             Contact Us

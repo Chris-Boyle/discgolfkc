@@ -4,18 +4,18 @@ import ReactPlayer from 'react-player/lazy';
 import Layout, { siteTitle } from '../components/layout';
 import Date from '../components/date';
 import utilStyles from '../styles/utils.module.css';
-import { getSortedPostsData } from '../lib/posts';
+import { getSortedCoursesData } from '../lib/courses';
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPostsData();
+  const allCoursesData = getSortedCoursesData();
   return {
     props: {
-      allPostsData,
+      allCoursesData,
     },
   };
 }
 
-export default function Home({ allPostsData }) {
+export default function Home({ allCoursesData }) {
   return (
     <>
       <Layout home>
@@ -26,20 +26,10 @@ export default function Home({ allPostsData }) {
           <p>Welcome! Check out the courses and maps.</p>
         </section>
         <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-          <h2 className={utilStyles.headingLg}>Disc Golf Courses</h2>
-          <ul className={utilStyles.list}>
-            {allPostsData.map(({ id, date, title }) => (
-              <li className={utilStyles.listItem} key={id}>
-                <Link href='/posts/[id]' as={`/posts/${id}`}>
-                  <a>{title}</a>
-                </Link>
-                <br />
-                <small className={utilStyles.lightText}>
-                  <Date dateString={date} />
-                </small>
-              </li>
-            ))}
-          </ul>
+          <Link href='/courses/'>
+            <a className={utilStyles.headingLg}>Disc Golf Courses</a>
+          </Link>
+          <br />
           <h2 className={utilStyles.headingLg}>
             2019 GBO TOP SHOTS | DISC GOLF HIGHLIGHT REEL
           </h2>

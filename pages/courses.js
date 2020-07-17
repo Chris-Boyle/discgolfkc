@@ -3,18 +3,18 @@ import Link from 'next/link';
 import Layout, { siteTitle } from '../components/layout';
 import Date from '../components/date';
 import utilStyles from '../styles/utils.module.css';
-import { getSortedPostsData } from '../lib/posts';
+import { getSortedCoursesData } from '../lib/courses';
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPostsData();
+  const allCourseData = getSortedCoursesData();
   return {
     props: {
-      allPostsData,
+      allCourseData,
     },
   };
 }
 
-export default function Workouts({ allPostsData }) {
+export default function Courses({ allCourseData }) {
   return (
     <>
       <Layout home>
@@ -22,11 +22,11 @@ export default function Workouts({ allPostsData }) {
           <title>{siteTitle}</title>
         </Head>
         <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-          <h2 className={utilStyles.headingLg}>Workouts</h2>
+          <h2 className={utilStyles.headingLg}>Disc Golf Courses</h2>
           <ul className={utilStyles.list}>
-            {allPostsData.map(({ id, date, title }) => (
+            {allCourseData.map(({ id, date, title }) => (
               <li className={utilStyles.listItem} key={id}>
-                <Link href='/posts/[id]' as={`/posts/${id}`}>
+                <Link href='/courses/[id]' as={`/courses/${id}`}>
                   <a>{title}</a>
                 </Link>
                 <br />
