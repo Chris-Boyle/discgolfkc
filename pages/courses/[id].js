@@ -34,7 +34,7 @@ export default function Courses({ courseData }) {
         <div className={utilStyles.lightText}>
           <Date dateString={courseData.date} />
         </div>
-        <iframe src={courseData.hole1} width='640' height='480'></iframe>
+        <iframe src={courseData.hole1} width='100%' height='480'></iframe>
         {courseData.url && (
           <ReactPlayer
             url={courseData.url}
