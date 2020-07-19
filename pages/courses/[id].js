@@ -24,17 +24,44 @@ export async function getStaticProps({ params }) {
 }
 
 export default function Courses({ courseData }) {
+  React.useEffect(() => {
+    if (courseData) {
+      console.log(courseData.holes[0].tee[1], courseData.holes[0].tee[2]);
+      var map;
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {
+          lat: courseData.holes[0].tee[0],
+          lng: courseData.holes[0].tee[1],
+        },
+        zoom: 19,
+        mapTypeId: 'satellite',
+      });
+    }
+  }, [courseData]);
+
   return (
     <Layout>
       <Head>
         <title>{courseData.title}</title>
+        <script
+          type='text/javascript'
+          src='https://maps.googleapis.com/maps/api/js?key=AIzaSyA07CFdDfGAJpznV70OmZqcMa2lJozIRhQ&libraries=drawing'
+        ></script>
       </Head>
       <article>
         <h1 className={utilStyles.headingXl}>{courseData.title}</h1>
         <div className={utilStyles.lightText}>
           <Date dateString={courseData.date} />
         </div>
-        <iframe src={courseData.hole1} width='100%' height='480'></iframe>
+        <div id='map' style={{ height: '30rem', marginBottom: '2rem' }}></div>
+        {courseData.map && (
+          <img
+            src={courseData.map}
+            width='100%'
+            height='480'
+            alt={courseData.name}
+          />
+        )}
         {courseData.url && (
           <ReactPlayer
             url={courseData.url}

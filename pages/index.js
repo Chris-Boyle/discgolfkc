@@ -26,7 +26,7 @@ export default function Home({ allCoursesData }) {
           <p>Welcome! Check out the courses and maps.</p>
         </section>
         <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-          <Link href='/courses/'>
+          <Link href='/courses'>
             <a className={utilStyles.headingLg}>Disc Golf Courses</a>
           </Link>
           <br />

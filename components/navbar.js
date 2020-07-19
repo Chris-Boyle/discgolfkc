@@ -65,6 +65,7 @@ export default function NavBar() {
           >
             <MenuItem onClick={() => router.push('/')}>Home</MenuItem>
             <MenuItem onClick={() => router.push('/courses')}>Courses</MenuItem>
+            <MenuItem onClick={() => router.push('/shop')}>Shop</MenuItem>
           </Menu>
           <Typography variant='h6' className={classes.title}>
             KC Disc Golf
