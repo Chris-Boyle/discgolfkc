@@ -26,7 +26,6 @@ export async function getStaticProps({ params }) {
 export default function Courses({ courseData }) {
   React.useEffect(() => {
     if (courseData) {
-      console.log(courseData.holes[0].tee[1], courseData.holes[0].tee[2]);
       var map;
       map = new google.maps.Map(document.getElementById('map'), {
         center: {
@@ -45,7 +44,7 @@ export default function Courses({ courseData }) {
         <title>{courseData.title}</title>
         <script
           type='text/javascript'
-          src='https://maps.googleapis.com/maps/api/js?key=AIzaSyA07CFdDfGAJpznV70OmZqcMa2lJozIRhQ&libraries=drawing'
+          src="https://maps.googleapis.com/maps/api/js?key=<%=ENV['GOOGLE_MAPS_API_KEY']%>&libraries=drawing"
         ></script>
       </Head>
       <article>
