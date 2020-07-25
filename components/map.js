@@ -49,9 +49,16 @@ export default function Map({ courseData }) {
           labelOrigin: new google.maps.Point(0, 50),
         },
       },
+      minion: {
+        icon: {
+          url: '/images/minion.png',
+          labelOrigin: new google.maps.Point(20, 30),
+        },
+      },
     };
 
-    var map;
+    var map, currentPosition;
+
     const teePosition = {
       lat: courseData.holes[activeStep].tee[0],
       lng: courseData.holes[activeStep].tee[1],
@@ -76,6 +83,32 @@ export default function Map({ courseData }) {
         style: google.maps.ZoomControlStyle.LARGE,
       },
     });
+
+    var bounds = new google.maps.LatLngBounds();
+
+    // Try HTML5 geolocation.
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        currentPosition = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        var playerPosition = new google.maps.Marker({
+          position: currentPosition,
+          icon: icons.minion.icon,
+          map: map,
+          label: new google.maps.Marker({
+            text: 'You',
+            color: 'white',
+            fontWeight: 'bold',
+          }),
+          animation: google.maps.Animation.DROP,
+        });
+        bounds.extend(currentPosition);
+        map.fitBounds(bounds);
+      });
+    }
+
     var teeMarker = new google.maps.Marker({
       position: teePosition,
       icon: icons.tee.icon,
@@ -94,7 +127,6 @@ export default function Map({ courseData }) {
       // label: '#1 Basket',
       animation: google.maps.Animation.DROP,
     });
-    var bounds = new google.maps.LatLngBounds();
     bounds.extend(basketMarker.position);
     bounds.extend(teeMarker.position);
     map.fitBounds(bounds);
