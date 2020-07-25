@@ -5,6 +5,9 @@ import Layout from '../../components/layout';
 import Date from '../../components/date';
 import utilStyles from '../../styles/utils.module.css';
 import { getAllCourseIds, getCourseData } from '../../lib/courses';
+import { TextareaAutosize } from '@material-ui/core';
+
+const googleAPIURL = `https://maps.googleapis.com/maps/api/js?key=${process.env.GOOGLE_MAPS_API_KEY}&libraries=drawing`;
 
 export async function getStaticPaths() {
   const paths = getAllCourseIds();
@@ -23,18 +26,47 @@ export async function getStaticProps({ params }) {
   };
 }
 
+const icons = {
+  basket: {
+    icon: '/images/basket.png',
+  },
+  tee: {
+    icon: '/images/frisbee-throw.png',
+  },
+};
+
 export default function Courses({ courseData }) {
   React.useEffect(() => {
     if (courseData) {
       var map;
       map = new google.maps.Map(document.getElementById('map'), {
-        center: {
+        zoom: 20, // overriden by bounds
+        mapTypeId: 'satellite',
+      });
+      var teeMarker = new google.maps.Marker({
+        position: {
           lat: courseData.holes[0].tee[0],
           lng: courseData.holes[0].tee[1],
         },
-        zoom: 19,
-        mapTypeId: 'satellite',
+        icon: icons.tee.icon,
+        map: map,
+        // label: '#1 Tee Box',
+        animation: google.maps.Animation.DROP,
       });
+      var basketMarker = new google.maps.Marker({
+        position: {
+          lat: courseData.holes[0].basket[0],
+          lng: courseData.holes[0].basket[1],
+        },
+        icon: icons.basket.icon,
+        map: map,
+        // label: '#1 Basket',
+        animation: google.maps.Animation.DROP,
+      });
+      var bounds = new google.maps.LatLngBounds();
+      bounds.extend(basketMarker.position);
+      bounds.extend(teeMarker.position);
+      map.fitBounds(bounds);
     }
   }, [courseData]);
 
@@ -42,10 +74,7 @@ export default function Courses({ courseData }) {
     <Layout>
       <Head>
         <title>{courseData.title}</title>
-        <script
-          type='text/javascript'
-          src="https://maps.googleapis.com/maps/api/js?key=<%=ENV['GOOGLE_MAPS_API_KEY']%>&libraries=drawing"
-        ></script>
+        <script type='text/javascript' src={googleAPIURL}></script>
       </Head>
       <article>
         <h1 className={utilStyles.headingXl}>{courseData.title}</h1>
