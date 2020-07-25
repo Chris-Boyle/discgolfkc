@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: '2rem',
   },
   nav: {
-    backgroundColor: '#659DBD',
+    backgroundColor: '#659DBD !important',
   },
   menuButton: {
     marginRight: theme.spacing(2),
