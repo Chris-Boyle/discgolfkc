@@ -80,7 +80,11 @@ export default function Map({ courseData }) {
       position: teePosition,
       icon: icons.tee.icon,
       map: map,
-      label: `${Math.round(distance / 0.3048)} feet`,
+      label: new google.maps.Marker({
+        text: `${Math.round(distance / 0.3048)} feet`,
+        color: 'white',
+        fontWeight: 'bold',
+      }),
       animation: google.maps.Animation.DROP,
     });
     var basketMarker = new google.maps.Marker({
@@ -104,7 +108,7 @@ export default function Map({ courseData }) {
     const flightPath = new google.maps.Polyline({
       path: [basketMarker.position, teeMarker.position],
       geodesic: true,
-      strokeColor: '#659DBD',
+      strokeColor: 'white',
       strokeOpacity: 0,
       strokeWeight: 4,
       icons: [
