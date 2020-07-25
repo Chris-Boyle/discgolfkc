@@ -2,13 +2,9 @@ import React from 'react';
 import ReactPlayer from 'react-player/lazy';
 import Head from 'next/head';
 import Layout from '../../components/layout';
-import Date from '../../components/date';
 import utilStyles from '../../styles/utils.module.css';
 import { getAllCourseIds, getCourseData } from '../../lib/courses';
-import { TextareaAutosize } from '@material-ui/core';
 import Map from '../../components/map';
-
-const googleAPIURL = `https://maps.googleapis.com/maps/api/js?key=${process.env.GOOGLE_MAPS_API_KEY}&libraries=drawing`;
 
 export async function getStaticPaths() {
   const paths = getAllCourseIds();
@@ -26,21 +22,15 @@ export async function getStaticProps({ params }) {
     },
   };
 }
-
-const icons = {
-  basket: {
-    icon: '/images/basket.png',
-  },
-  tee: {
-    icon: '/images/frisbee-throw.png',
-  },
-};
+const APIKey = process.env.GOOGLE_MAPS_API_KEY;
+const googleAPIURL = `https://maps.googleapis.com/maps/api/js?key=${APIKey}&libraries=drawing,geometry`;
 
 export default function Courses({ courseData }) {
   return (
     <Layout>
       <Head>
         <title>{courseData.title}</title>
+        <script type='text/javascript' src={googleAPIURL} />
       </Head>
       <article>
         <h1 className={utilStyles.headingXl}>{courseData.title}</h1>

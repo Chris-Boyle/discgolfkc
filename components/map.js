@@ -7,9 +7,6 @@ import Button from '@material-ui/core/Button';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 
-const APIKey = process.env.GOOGLE_MAPS_API_KEY;
-const googleAPIURL = `https://maps.googleapis.com/maps/api/js?key=${APIKey}&libraries=drawing,geometry`;
-
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -71,100 +68,93 @@ export default function Map({ courseData }) {
       new google.maps.LatLng(teePosition.lat, teePosition.lng),
       new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
     );
-
-    map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 20, // overriden by bounds
-      mapTypeId: 'satellite',
-      disableDefaultUI: true, // a way to quickly hide all controls
-      mapTypeControl: true,
-      scaleControl: true,
-      zoomControl: true,
-      zoomControlOptions: {
-        style: google.maps.ZoomControlStyle.LARGE,
-      },
-    });
-
-    var bounds = new google.maps.LatLngBounds();
-
-    // Try HTML5 geolocation.
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        currentPosition = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-        var playerPosition = new google.maps.Marker({
-          position: currentPosition,
-          icon: icons.minion.icon,
-          map: map,
-          label: new google.maps.Marker({
-            text: 'You',
-            color: 'white',
-            fontWeight: 'bold',
-          }),
-          animation: google.maps.Animation.DROP,
-        });
-        bounds.extend(currentPosition);
-        map.fitBounds(bounds);
-      });
-    }
-
-    var teeMarker = new google.maps.Marker({
-      position: teePosition,
-      icon: icons.tee.icon,
-      map: map,
-      label: new google.maps.Marker({
-        text: `${Math.round(distance / 0.3048)} feet`,
-        color: 'white',
-        fontWeight: 'bold',
-      }),
-      animation: google.maps.Animation.DROP,
-    });
-    var basketMarker = new google.maps.Marker({
-      position: basketPosition,
-      icon: icons.basket.icon,
-      map: map,
-      // label: '#1 Basket',
-      animation: google.maps.Animation.DROP,
-    });
-    bounds.extend(basketMarker.position);
-    bounds.extend(teeMarker.position);
-    map.fitBounds(bounds);
-
-    var lineSymbol = {
-      path: 'M 0,-1 0,1',
-      strokeOpacity: 1,
-      scale: 4,
-    };
-
-    const flightPath = new google.maps.Polyline({
-      path: [basketMarker.position, teeMarker.position],
-      geodesic: true,
-      strokeColor: 'white',
-      strokeOpacity: 0,
-      strokeWeight: 4,
-      icons: [
-        {
-          icon: lineSymbol,
-          offset: '0',
-          repeat: '20px',
+    if (google) {
+      map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 20, // overriden by bounds
+        mapTypeId: 'satellite',
+        disableDefaultUI: true, // a way to quickly hide all controls
+        mapTypeControl: true,
+        scaleControl: true,
+        zoomControl: true,
+        zoomControlOptions: {
+          style: google.maps.ZoomControlStyle.LARGE,
         },
-      ],
-    });
+      });
 
-    new google.maps.Marker({
-      position: new google.maps.LatLng(50, 50),
-      label: 'distancedistancedistancedistancedistancedistance',
-      map: map,
-      icon: icons.basket.icon,
-    });
+      var bounds = new google.maps.LatLngBounds();
 
-    flightPath.setMap(map);
+      // Try HTML5 geolocation.
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          currentPosition = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          var playerPosition = new google.maps.Marker({
+            position: currentPosition,
+            icon: icons.minion.icon,
+            map: map,
+            label: new google.maps.Marker({
+              text: 'You',
+              color: 'white',
+              fontWeight: 'bold',
+            }),
+            animation: google.maps.Animation.DROP,
+          });
+          bounds.extend(currentPosition);
+          map.fitBounds(bounds);
+        });
+      }
+
+      var teeMarker = new google.maps.Marker({
+        position: teePosition,
+        icon: icons.tee.icon,
+        map: map,
+        label: new google.maps.Marker({
+          text: `${Math.round(distance / 0.3048)} feet`,
+          color: 'white',
+          fontWeight: 'bold',
+        }),
+        animation: google.maps.Animation.DROP,
+      });
+      var basketMarker = new google.maps.Marker({
+        position: basketPosition,
+        icon: icons.basket.icon,
+        map: map,
+        // label: '#1 Basket',
+        animation: google.maps.Animation.DROP,
+      });
+      bounds.extend(basketMarker.position);
+      bounds.extend(teeMarker.position);
+      map.fitBounds(bounds);
+
+      var lineSymbol = {
+        path: 'M 0,-1 0,1',
+        strokeOpacity: 1,
+        scale: 4,
+      };
+
+      const flightPath = new google.maps.Polyline({
+        path: [basketMarker.position, teeMarker.position],
+        geodesic: true,
+        strokeColor: 'white',
+        strokeOpacity: 0,
+        strokeWeight: 4,
+        icons: [
+          {
+            icon: lineSymbol,
+            offset: '0',
+            repeat: '20px',
+          },
+        ],
+      });
+
+      flightPath.setMap(map);
+    }
   }, [courseData, activeStep]);
 
   return (
     <div className={classes.root}>
-      <script type='text/javascript' src={googleAPIURL} />
       <Paper square elevation={0} className={classes.header}>
         <Typography> Hole {activeStep + 1}</Typography>
       </Paper>
