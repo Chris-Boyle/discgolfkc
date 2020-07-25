@@ -47,7 +47,7 @@ export default function Courses({ courseData }) {
         <div className={utilStyles.lightText}>
           <h2>{courseData.address}</h2>
         </div>
-        <Map courseData={courseData} />
+        {courseData.holes?.length > 0 && <Map courseData={courseData} />}
         {courseData.map && (
           <img
             src={courseData.map}

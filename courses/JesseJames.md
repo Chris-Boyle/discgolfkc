@@ -2,9 +2,7 @@
 title: 'Jesse James'
 date: '2020-07-18'
 map: '/images/JesseJamesDGCMap.jpg'
-name: 'Course Map'
 address: '3001 N Hwy 33, Kearney, MO 64060'
-url: ''
 parking: ['39.3933', '-94.3657']
 holes:
   [
