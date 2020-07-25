@@ -16,6 +16,9 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     paddingBottom: '2rem',
   },
+  nav: {
+    backgroundColor: '#659DBD',
+  },
   menuButton: {
     marginRight: theme.spacing(2),
   },
@@ -41,7 +44,7 @@ export default function NavBar() {
 
   return (
     <div className={classes.root}>
-      <AppBar position='fixed'>
+      <AppBar className={classes.nav} position='fixed'>
         <Toolbar>
           <IconButton
             edge='start'
@@ -68,7 +71,7 @@ export default function NavBar() {
             <MenuItem onClick={() => router.push('/shop')}>Shop</MenuItem>
           </Menu>
           <Typography variant='h6' className={classes.title}>
-            KC Disc Golf
+            Disc Golf KC
           </Typography>
           <Button color='inherit' onClick={() => router.push('/contact')}>
             Contact Us

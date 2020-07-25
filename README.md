@@ -1,6 +1,6 @@
-## KC Disc Golf
+## Disc Golf KC
 
-This is the nextjs app for [Kc Disc Golf](https://kcdiscgolf.vercel.app/).
+This is the nextjs app for [Disc Golf KC](https://discgolfkc.vercel.app/).
 
 This is a project to showcase all of the great disc golf courses around the city.
 

@@ -4,8 +4,8 @@ import utilStyles from '../styles/utils.module.css';
 import Link from 'next/link';
 import NavBar from './navbar';
 
-const name = 'KC Disc Golf';
-export const siteTitle = 'KC Disc Golf';
+const name = 'Disc Golf KC';
+export const siteTitle = 'Disc Golf KC';
 
 export default function Layout({ children, home }) {
   return (
@@ -13,11 +13,8 @@ export default function Layout({ children, home }) {
       <NavBar />
       <div className={styles.container}>
         <Head>
-          <link rel='icon' href='/favicon.ico' />
-          <meta
-            name='description'
-            content='Learn how to build a personal website using Next.js'
-          />
+          <link rel='icon' href='/images/8-frisbees.jpg' />
+          <meta name='description' />
           <meta
             property='og:image'
             content={`https://og-image.now.sh/${encodeURI(
