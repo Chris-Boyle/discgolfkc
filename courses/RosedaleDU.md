@@ -3,6 +3,7 @@ title: 'Rosedale Park Down Under'
 date: '2020-07-25'
 address: 'Rosedale Park Rd, Kansas City, KS 66103'
 parking: [39.0537589, -94.6229390]
+totalPar: '54'
 holes:
   [
     {

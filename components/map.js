@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
   },
   form: {
     width: '100%',
+    marginTop: '1rem',
   },
   field: {
     marginLeft: '2rem',
@@ -34,6 +35,7 @@ export default function Map({ courseData }) {
   const [activeStep, setActiveStep] = React.useState(0);
   const [totalThrows, settotalThrows] = React.useState(0);
   const [throws, setThrows] = React.useState();
+  const [holeDistance, setHoleDistance] = React.useState(0);
 
   const maxSteps = courseData.holes.length;
 
@@ -47,7 +49,7 @@ export default function Map({ courseData }) {
 
   const handleThrowChange = (event) => {
     settotalThrows(+event.target.value + totalThrows);
-    setThrows(0);
+    setThrows('');
   };
 
   React.useEffect(() => {
@@ -69,7 +71,7 @@ export default function Map({ courseData }) {
       },
     };
 
-    var map, currentPosition, playerPosition;
+    let map, currentPosition, playerPosition, playerDistance;
 
     const teePosition = {
       lat: courseData.holes[activeStep].tee[0],
@@ -79,10 +81,13 @@ export default function Map({ courseData }) {
       lat: courseData.holes[activeStep].basket[0],
       lng: courseData.holes[activeStep].basket[1],
     };
+
     const distance = google.maps.geometry.spherical.computeDistanceBetween(
       new google.maps.LatLng(teePosition.lat, teePosition.lng),
       new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
     );
+    setHoleDistance(distance);
+
     if (google) {
       map = new google.maps.Map(document.getElementById('map'), {
         zoom: 20, // overriden by bounds
@@ -96,7 +101,7 @@ export default function Map({ courseData }) {
         },
       });
 
-      var bounds = new google.maps.LatLngBounds();
+      const bounds = new google.maps.LatLngBounds();
 
       playerPosition = new google.maps.Marker({
         icon: icons.minion.icon,
@@ -120,28 +125,35 @@ export default function Map({ courseData }) {
 
       // Try HTML5 geolocation.
       if (navigator.geolocation) {
-        navigator.geolocation.watchPosition((position) => {
-          currentPosition = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          const playerDistance = google.maps.geometry.spherical.computeDistanceBetween(
-            new google.maps.LatLng(currentPosition.lat, currentPosition.lng),
-            new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
-          );
-          playerPosition.setPosition(currentPosition);
-          playerPosition.setOptions({
-            label: new google.maps.Marker({
-              text: `${Math.round(playerDistance / 0.3048)} feet`,
-              color: 'white',
-              fontWeight: 'bold',
-            }),
-          });
-          playerPath.setPath([basketMarker.position, playerPosition.position]);
-          playerPath.setMap(map);
-          // bounds.extend(currentPosition);
-          // map.fitBounds(bounds);
-        });
+        navigator.geolocation.watchPosition(
+          (position) => {
+            currentPosition = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            playerDistance = google.maps.geometry.spherical.computeDistanceBetween(
+              new google.maps.LatLng(currentPosition.lat, currentPosition.lng),
+              new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
+            );
+            playerPosition.setPosition(currentPosition);
+            playerPosition.setOptions({
+              label: new google.maps.Marker({
+                text: `${Math.round(playerDistance / 0.3048)} feet`,
+                color: 'white',
+                fontWeight: 'bold',
+              }),
+            });
+            playerPath.setPath([
+              basketMarker.position,
+              playerPosition.position,
+            ]);
+            playerPath.setMap(map);
+            // bounds.extend(currentPosition);
+            // map.fitBounds(bounds);
+          },
+          () => {},
+          { enableHighAccuracy: true }
+        );
       }
 
       var teeMarker = new google.maps.Marker({
@@ -195,9 +207,9 @@ export default function Map({ courseData }) {
     <div className={classes.root}>
       <form className={classes.form} noValidate autoComplete='off'>
         <TextField
-          style={{ width: '5rem' }}
+          style={{ width: '4rem' }}
           id='par'
-          label='Par'
+          label={`Par (${courseData.totalPar})`}
           defaultValue={courseData.holes[activeStep].par}
           InputProps={{
             readOnly: true,
@@ -205,7 +217,17 @@ export default function Map({ courseData }) {
           variant='outlined'
         />
         <TextField
-          style={{ width: '5rem', marginLeft: '1rem' }}
+          style={{ width: '5.5rem', marginLeft: '1rem' }}
+          id='distance'
+          label='Distance'
+          value={`${Math.round(holeDistance / 0.3048)} feet`}
+          InputProps={{
+            readOnly: true,
+          }}
+          variant='outlined'
+        />
+        <TextField
+          style={{ width: '5.5rem', marginLeft: '1rem' }}
           id='hole'
           type='number'
           label='Throws'
@@ -215,7 +237,7 @@ export default function Map({ courseData }) {
           onBlur={handleThrowChange}
         />
         <TextField
-          style={{ width: '5rem', marginLeft: '1rem' }}
+          style={{ width: '4rem', marginLeft: '1rem' }}
           id='total'
           type='number'
           label='Total'
