@@ -1,11 +1,19 @@
 import React from 'react';
 import ReactPlayer from 'react-player/lazy';
 import Head from 'next/head';
+import { makeStyles } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
+import Typography from '@material-ui/core/Typography';
 import Layout from '../../components/layout';
 import utilStyles from '../../styles/utils.module.css';
 import { getAllCourseIds, getCourseData } from '../../lib/courses';
 import Map from '../../components/map';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    margin: '1rem',
+  },
+}));
 
 export async function getStaticPaths() {
   const paths = getAllCourseIds();
@@ -44,6 +52,8 @@ const openMap = (courseData) => {
 };
 
 export default function Courses({ courseData }) {
+  const classes = useStyles();
+
   return (
     <Layout>
       <Head>
@@ -53,13 +63,15 @@ export default function Courses({ courseData }) {
       <article>
         <h1 className={utilStyles.headingXl}>{courseData.title}</h1>
         <div className={utilStyles.lightText}>
-          <Link
-            onClick={() => openMap(courseData)}
-            component='button'
-            variant='body1'
-          >
-            {courseData.address}
-          </Link>
+          <Typography className={classes.root}>
+            <Link
+              onClick={() => openMap(courseData)}
+              component='button'
+              variant='body1'
+            >
+              {courseData.address}
+            </Link>
+          </Typography>
         </div>
         {courseData.holes?.length > 0 && <Map courseData={courseData} />}
         {courseData.map && (

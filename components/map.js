@@ -7,6 +7,7 @@ import Button from '@material-ui/core/Button';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import TextField from '@material-ui/core/TextField';
+import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -204,47 +205,52 @@ export default function Map({ courseData }) {
   }, [courseData, activeStep]);
 
   return (
-    <div className={classes.root}>
-      <form className={classes.form} noValidate autoComplete='off'>
-        <TextField
-          style={{ width: '4rem' }}
-          id='par'
-          label={`Par (${courseData.totalPar})`}
-          defaultValue={courseData.holes[activeStep].par}
-          InputProps={{
-            readOnly: true,
-          }}
-          variant='outlined'
-        />
-        <TextField
-          style={{ width: '5.5rem', marginLeft: '1rem' }}
-          id='distance'
-          label='Distance'
-          value={`${Math.round(holeDistance / 0.3048)} feet`}
-          InputProps={{
-            readOnly: true,
-          }}
-          variant='outlined'
-        />
-        <TextField
-          style={{ width: '5.5rem', marginLeft: '1rem' }}
-          id='hole'
-          type='number'
-          label='Throws'
-          variant='outlined'
-          value={throws}
-          onChange={() => setThrows(event.target.value)}
-          onBlur={handleThrowChange}
-        />
-        <TextField
-          style={{ width: '4rem', marginLeft: '1rem' }}
-          id='total'
-          type='number'
-          label='Total'
-          variant='outlined'
-          value={totalThrows}
-        />
-      </form>
+    <div>
+      <Grid container className={classes.root} spacing={1}>
+        <Grid item xs={3}>
+          <TextField
+            id='par'
+            label={`Par (${courseData.totalPar})`}
+            defaultValue={courseData.holes[activeStep].par}
+            InputProps={{
+              readOnly: true,
+            }}
+            variant='outlined'
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <TextField
+            id='distance'
+            label='Distance'
+            value={`${Math.round(holeDistance / 0.3048)} feet`}
+            InputProps={{
+              readOnly: true,
+            }}
+            variant='outlined'
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <TextField
+            id='hole'
+            type='number'
+            label='Throws'
+            variant='outlined'
+            value={throws}
+            onChange={() => setThrows(event.target.value)}
+            onBlur={handleThrowChange}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          <TextField
+            id='total'
+            type='number'
+            label='Total'
+            variant='outlined'
+            value={totalThrows}
+          />
+        </Grid>
+      </Grid>
+
       <Paper square elevation={0} className={classes.header}>
         <Typography> Hole {activeStep + 1}</Typography>
       </Paper>
