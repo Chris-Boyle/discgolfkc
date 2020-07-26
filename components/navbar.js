@@ -44,7 +44,7 @@ export default function NavBar() {
 
   return (
     <div className={classes.root}>
-      <AppBar className={classes.nav} position='fixed'>
+      <AppBar className={classes.nav} id='nav' position='fixed'>
         <Toolbar>
           <IconButton
             edge='start'

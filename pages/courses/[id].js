@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactPlayer from 'react-player/lazy';
 import Head from 'next/head';
+import Link from '@material-ui/core/Link';
 import Layout from '../../components/layout';
 import utilStyles from '../../styles/utils.module.css';
 import { getAllCourseIds, getCourseData } from '../../lib/courses';
@@ -22,8 +23,25 @@ export async function getStaticProps({ params }) {
     },
   };
 }
+
 const APIKey = process.env.GOOGLE_MAPS_API_KEY;
 const googleAPIURL = `https://maps.googleapis.com/maps/api/js?key=${APIKey}&libraries=drawing,geometry`;
+
+const openMap = (courseData) => {
+  if (
+    /* if we're on iOS, open in Apple Maps */
+    navigator.platform.indexOf('iPhone') != -1 ||
+    navigator.platform.indexOf('iPad') != -1 ||
+    navigator.platform.indexOf('iPod') != -1
+  )
+    window.open(
+      `maps://maps.google.com/maps/dir/?daddr=${courseData.parking}&amp;ll=`
+    );
+  /* else use Google */ else
+    window.open(
+      `https://maps.google.com/maps/dir/?daddr=${courseData.parking}&amp;ll=`
+    );
+};
 
 export default function Courses({ courseData }) {
   return (
@@ -35,7 +53,13 @@ export default function Courses({ courseData }) {
       <article>
         <h1 className={utilStyles.headingXl}>{courseData.title}</h1>
         <div className={utilStyles.lightText}>
-          <h2>{courseData.address}</h2>
+          <Link
+            onClick={() => openMap(courseData)}
+            component='button'
+            variant='body1'
+          >
+            {courseData.address}
+          </Link>
         </div>
         {courseData.holes?.length > 0 && <Map courseData={courseData} />}
         {courseData.map && (

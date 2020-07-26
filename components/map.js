@@ -6,10 +6,17 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import TextField from '@material-ui/core/TextField';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+  },
+  form: {
+    width: '100%',
+  },
+  field: {
+    marginLeft: '2rem',
   },
   header: {
     display: 'flex',
@@ -25,6 +32,9 @@ export default function Map({ courseData }) {
   const classes = useStyles();
   const theme = useTheme();
   const [activeStep, setActiveStep] = React.useState(0);
+  const [totalThrows, settotalThrows] = React.useState(0);
+  const [throws, setThrows] = React.useState();
+
   const maxSteps = courseData.holes.length;
 
   const handleNext = () => {
@@ -33,6 +43,11 @@ export default function Map({ courseData }) {
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleThrowChange = (event) => {
+    settotalThrows(+event.target.value + totalThrows);
+    setThrows(0);
   };
 
   React.useEffect(() => {
@@ -54,7 +69,7 @@ export default function Map({ courseData }) {
       },
     };
 
-    var map, currentPosition;
+    var map, currentPosition, playerPosition;
 
     const teePosition = {
       lat: courseData.holes[activeStep].tee[0],
@@ -83,26 +98,49 @@ export default function Map({ courseData }) {
 
       var bounds = new google.maps.LatLngBounds();
 
+      playerPosition = new google.maps.Marker({
+        icon: icons.minion.icon,
+        map: map,
+        animation: google.maps.Animation.DROP,
+      });
+
+      const playerPath = new google.maps.Polyline({
+        geodesic: true,
+        strokeColor: 'white',
+        strokeOpacity: 0,
+        strokeWeight: 4,
+        icons: [
+          {
+            icon: { path: 'M 0,-1 0,1', strokeOpacity: 0.5, scale: 4 },
+            offset: '0',
+            repeat: '20px',
+          },
+        ],
+      });
+
       // Try HTML5 geolocation.
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
+        navigator.geolocation.watchPosition((position) => {
           currentPosition = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
-          var playerPosition = new google.maps.Marker({
-            position: currentPosition,
-            icon: icons.minion.icon,
-            map: map,
+          const playerDistance = google.maps.geometry.spherical.computeDistanceBetween(
+            new google.maps.LatLng(currentPosition.lat, currentPosition.lng),
+            new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
+          );
+          playerPosition.setPosition(currentPosition);
+          playerPosition.setOptions({
             label: new google.maps.Marker({
-              text: 'You',
+              text: `${Math.round(playerDistance / 0.3048)} feet`,
               color: 'white',
               fontWeight: 'bold',
             }),
-            animation: google.maps.Animation.DROP,
           });
-          bounds.extend(currentPosition);
-          map.fitBounds(bounds);
+          playerPath.setPath([basketMarker.position, playerPosition.position]);
+          playerPath.setMap(map);
+          // bounds.extend(currentPosition);
+          // map.fitBounds(bounds);
         });
       }
 
@@ -155,6 +193,36 @@ export default function Map({ courseData }) {
 
   return (
     <div className={classes.root}>
+      <form className={classes.form} noValidate autoComplete='off'>
+        <TextField
+          style={{ width: '5rem' }}
+          id='par'
+          label='Par'
+          defaultValue={courseData.holes[activeStep].par}
+          InputProps={{
+            readOnly: true,
+          }}
+          variant='outlined'
+        />
+        <TextField
+          style={{ width: '5rem', marginLeft: '1rem' }}
+          id='hole'
+          type='number'
+          label='Throws'
+          variant='outlined'
+          value={throws}
+          onChange={() => setThrows(event.target.value)}
+          onBlur={handleThrowChange}
+        />
+        <TextField
+          style={{ width: '5rem', marginLeft: '1rem' }}
+          id='total'
+          type='number'
+          label='Total'
+          variant='outlined'
+          value={totalThrows}
+        />
+      </form>
       <Paper square elevation={0} className={classes.header}>
         <Typography> Hole {activeStep + 1}</Typography>
       </Paper>
@@ -172,7 +240,7 @@ export default function Map({ courseData }) {
             disabled={activeStep === maxSteps - 1}
             className={classes.header}
           >
-            Next
+            Next Hole
             {theme.direction === 'rtl' ? (
               <KeyboardArrowLeft />
             ) : (
