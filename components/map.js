@@ -54,42 +54,45 @@ export default function Map({ courseData }) {
   };
 
   React.useEffect(() => {
-    const icons = {
-      basket: {
-        icon: '/images/basket.png',
-      },
-      tee: {
-        icon: {
-          url: '/images/frisbee-throw.png',
-          labelOrigin: new google.maps.Point(0, 50),
-        },
-      },
-      minion: {
-        icon: {
-          url: '/images/minion.png',
-          labelOrigin: new google.maps.Point(20, 30),
-        },
-      },
-    };
-
-    let map, currentPosition, playerPosition, playerDistance;
-
-    const teePosition = {
-      lat: courseData.holes[activeStep].tee[0],
-      lng: courseData.holes[activeStep].tee[1],
-    };
-    const basketPosition = {
-      lat: courseData.holes[activeStep].basket[0],
-      lng: courseData.holes[activeStep].basket[1],
-    };
-
-    const distance = google.maps.geometry.spherical.computeDistanceBetween(
-      new google.maps.LatLng(teePosition.lat, teePosition.lng),
-      new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
-    );
-    setHoleDistance(distance);
-
     if (google) {
+      const icons = {
+        basket: {
+          icon: {
+            url: '/images/yelllow-basket.png',
+            labelOrigin: new google.maps.Point(20, 50),
+          },
+        },
+        tee: {
+          icon: {
+            url: '/images/red-thrower.png',
+            labelOrigin: new google.maps.Point(20, 50),
+          },
+        },
+        minion: {
+          icon: {
+            url: '/images/minion.png',
+            labelOrigin: new google.maps.Point(20, 30),
+          },
+        },
+      };
+
+      let map, currentPosition, playerPosition, playerDistance;
+
+      const teePosition = {
+        lat: courseData.holes[activeStep].tee[0],
+        lng: courseData.holes[activeStep].tee[1],
+      };
+      const basketPosition = {
+        lat: courseData.holes[activeStep].basket[0],
+        lng: courseData.holes[activeStep].basket[1],
+      };
+
+      const distance = google.maps.geometry.spherical.computeDistanceBetween(
+        new google.maps.LatLng(teePosition.lat, teePosition.lng),
+        new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
+      );
+      setHoleDistance(distance);
+
       map = new google.maps.Map(document.getElementById('map'), {
         zoom: 20, // overriden by bounds
         mapTypeId: 'satellite',
@@ -124,37 +127,8 @@ export default function Map({ courseData }) {
         ],
       });
 
-      // Try HTML5 geolocation.
-      if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
-          (position) => {
-            currentPosition = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            };
-            playerDistance = google.maps.geometry.spherical.computeDistanceBetween(
-              new google.maps.LatLng(currentPosition.lat, currentPosition.lng),
-              new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
-            );
-            playerPosition.setPosition(currentPosition);
-            playerPosition.setOptions({
-              label: new google.maps.Marker({
-                text: `${Math.round(playerDistance / 0.3048)} feet`,
-                color: 'white',
-                fontWeight: 'bold',
-              }),
-            });
-            playerPath.setPath([
-              basketMarker.position,
-              playerPosition.position,
-            ]);
-            playerPath.setMap(map);
-            // bounds.extend(currentPosition);
-            // map.fitBounds(bounds);
-          },
-          () => {},
-          { enableHighAccuracy: true }
-        );
+      function error(err) {
+        console.warn('ERROR(' + err.code + '): ' + err.message);
       }
 
       var teeMarker = new google.maps.Marker({
@@ -172,9 +146,44 @@ export default function Map({ courseData }) {
         position: basketPosition,
         icon: icons.basket.icon,
         map: map,
-        // label: '#1 Basket',
         animation: google.maps.Animation.DROP,
       });
+
+      // Try HTML5 geolocation.
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+          (position) => {
+            currentPosition = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            playerDistance = google.maps.geometry.spherical.computeDistanceBetween(
+              new google.maps.LatLng(currentPosition.lat, currentPosition.lng),
+              new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
+            );
+            playerPosition.setPosition(currentPosition);
+            basketMarker.setOptions({
+              label: new google.maps.Marker({
+                text: `${Math.round(playerDistance / 0.3048)} feet`,
+                color: 'orange',
+                fontWeight: 'bold',
+              }),
+            });
+            playerPath.setPath([
+              basketMarker.position,
+              playerPosition.position,
+            ]);
+            playerPath.setMap(map);
+            // bounds.extend(currentPosition);
+            // map.fitBounds(bounds);
+          },
+          error,
+          {
+            enableHighAccuracy: true,
+          }
+        );
+      }
+
       bounds.extend(basketMarker.position);
       bounds.extend(teeMarker.position);
       map.fitBounds(bounds);

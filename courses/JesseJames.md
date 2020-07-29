@@ -117,7 +117,3 @@ holes:
     },
   ]
 ---
-
-## Jesse James DGC
-
-### 3001 N Hwy 33, Kearney, MO 64060
