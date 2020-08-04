@@ -7,12 +7,16 @@ import NavBar from './navbar';
 const name = 'Disc Golf KC';
 export const siteTitle = 'Disc Golf KC';
 
+const APIKey = process.env.GOOGLE_MAPS_API_KEY;
+const googleAPIURL = `https://maps.googleapis.com/maps/api/js?key=${APIKey}&libraries=drawing,geometry`;
+
 export default function Layout({ children, home }) {
   return (
     <>
       <NavBar />
       <div className={styles.container}>
         <Head>
+          <script type='text/javascript' src={googleAPIURL} />
           <link rel='icon' href='/images/8-frisbees.jpg' />
           <meta name='description' />
           <meta

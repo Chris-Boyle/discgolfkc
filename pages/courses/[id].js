@@ -32,9 +32,6 @@ export async function getStaticProps({ params }) {
   };
 }
 
-const APIKey = process.env.GOOGLE_MAPS_API_KEY;
-const googleAPIURL = `https://maps.googleapis.com/maps/api/js?key=${APIKey}&libraries=drawing,geometry`;
-
 const openMap = (courseData) => {
   if (
     /* if we're on iOS, open in Apple Maps */
@@ -58,7 +55,6 @@ export default function Courses({ courseData }) {
     <Layout>
       <Head>
         <title>{courseData.title}</title>
-        <script type='text/javascript' src={googleAPIURL} />
       </Head>
       <article>
         <h1 className={utilStyles.headingXl}>{courseData.title}</h1>

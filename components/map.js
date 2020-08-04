@@ -54,7 +54,7 @@ export default function Map({ courseData }) {
   };
 
   React.useEffect(() => {
-    if (google) {
+    if (!!google) {
       const icons = {
         basket: {
           icon: {
