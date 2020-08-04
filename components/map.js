@@ -28,6 +28,13 @@ const useStyles = makeStyles((theme) => ({
     color: 'white',
     backgroundColor: 'black',
   },
+  button: {
+    display: 'flex',
+    alignItems: 'center',
+    height: 50,
+    color: 'white',
+    backgroundColor: 'black',
+  },
 }));
 
 export default function Map({ courseData }) {
@@ -136,7 +143,7 @@ export default function Map({ courseData }) {
         icon: icons.tee.icon,
         map: map,
         label: new google.maps.Marker({
-          text: `${Math.round(distance / 0.3048)} feet`,
+          text: `${Math.round(distance / 0.3048)} ft`,
           color: 'white',
           fontWeight: 'bold',
         }),
@@ -164,7 +171,7 @@ export default function Map({ courseData }) {
             playerPosition.setPosition(currentPosition);
             basketMarker.setOptions({
               label: new google.maps.Marker({
-                text: `${Math.round(playerDistance / 0.3048)} feet`,
+                text: `${Math.round(playerDistance / 0.3048)} ft`,
                 color: 'orange',
                 fontWeight: 'bold',
               }),
@@ -227,18 +234,18 @@ export default function Map({ courseData }) {
             variant='outlined'
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <TextField
             id='distance'
             label='Distance'
-            value={`${Math.round(holeDistance / 0.3048)} feet`}
+            value={`${Math.round(holeDistance / 0.3048)} ft`}
             InputProps={{
               readOnly: true,
             }}
             variant='outlined'
           />
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={4}>
           <TextField
             id='hole'
             type='number'
@@ -269,13 +276,13 @@ export default function Map({ courseData }) {
         position='static'
         variant='text'
         activeStep={activeStep}
-        className={classes.header}
+        className={classes.button}
         nextButton={
           <Button
             size='small'
             onClick={handleNext}
             disabled={activeStep === maxSteps - 1}
-            className={classes.header}
+            className={classes.button}
           >
             Next Hole
             {theme.direction === 'rtl' ? (
@@ -289,7 +296,7 @@ export default function Map({ courseData }) {
           <Button
             size='small'
             onClick={handleBack}
-            className={classes.header}
+            className={classes.button}
             disabled={activeStep === 0}
           >
             {theme.direction === 'rtl' ? (
