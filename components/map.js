@@ -67,12 +67,14 @@ export default function Map({ courseData }) {
           icon: {
             url: '/images/yelllow-basket.png',
             labelOrigin: new google.maps.Point(20, 50),
+            scaledSize: new google.maps.Size(20, 20),
           },
         },
         tee: {
           icon: {
             url: '/images/red-thrower.png',
-            labelOrigin: new google.maps.Point(20, 50),
+            labelOrigin: new google.maps.Point(20, 30),
+            scaledSize: new google.maps.Size(20, 20),
           },
         },
         minion: {
@@ -83,24 +85,36 @@ export default function Map({ courseData }) {
         },
       };
 
-      let map, currentPosition, playerPosition, playerDistance;
-
-      const teePosition = {
+      let currentPosition, playerPosition, playerDistance;
+      const activeTeePosition = {
         lat: courseData.holes[activeStep].tee[0],
         lng: courseData.holes[activeStep].tee[1],
       };
-      const basketPosition = {
+      const activeBasketPosition = {
         lat: courseData.holes[activeStep].basket[0],
         lng: courseData.holes[activeStep].basket[1],
       };
 
-      const distance = google.maps.geometry.spherical.computeDistanceBetween(
-        new google.maps.LatLng(teePosition.lat, teePosition.lng),
-        new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
-      );
-      setHoleDistance(distance);
+      const activeTeeMarker = new google.maps.Marker({
+        position: activeTeePosition,
+        icon: icons.tee.icon,
+        map: map,
+        label: new google.maps.Marker({
+          text: `${activeStep} - ${Math.round(distance / 0.3048)} ft`,
+          color: 'white',
+          fontWeight: 'bold',
+        }),
+        animation: google.maps.Animation.DROP,
+      });
 
-      map = new google.maps.Map(document.getElementById('map'), {
+      const activeBasketMarker = new google.maps.Marker({
+        position: activeBasketPosition,
+        icon: icons.basket.icon,
+        map: map,
+        animation: google.maps.Animation.DROP,
+      });
+
+      const map = new google.maps.Map(document.getElementById('map'), {
         zoom: 20, // overriden by bounds
         mapTypeId: 'satellite',
         disableDefaultUI: true, // a way to quickly hide all controls
@@ -113,110 +127,126 @@ export default function Map({ courseData }) {
       });
 
       const bounds = new google.maps.LatLngBounds();
-
-      playerPosition = new google.maps.Marker({
-        icon: icons.minion.icon,
-        map: map,
-        animation: google.maps.Animation.DROP,
-      });
-
-      const playerPath = new google.maps.Polyline({
-        geodesic: true,
-        strokeColor: 'white',
-        strokeOpacity: 0,
-        strokeWeight: 4,
-        icons: [
-          {
-            icon: { path: 'M 0,-1 0,1', strokeOpacity: 0.5, scale: 4 },
-            offset: '0',
-            repeat: '20px',
-          },
-        ],
-      });
-
-      function error(err) {
-        console.warn('ERROR(' + err.code + '): ' + err.message);
-      }
-
-      var teeMarker = new google.maps.Marker({
-        position: teePosition,
-        icon: icons.tee.icon,
-        map: map,
-        label: new google.maps.Marker({
-          text: `${Math.round(distance / 0.3048)} ft`,
-          color: 'white',
-          fontWeight: 'bold',
-        }),
-        animation: google.maps.Animation.DROP,
-      });
-      var basketMarker = new google.maps.Marker({
-        position: basketPosition,
-        icon: icons.basket.icon,
-        map: map,
-        animation: google.maps.Animation.DROP,
-      });
-
-      // Try HTML5 geolocation.
-      if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
-          (position) => {
-            currentPosition = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            };
-            playerDistance = google.maps.geometry.spherical.computeDistanceBetween(
-              new google.maps.LatLng(currentPosition.lat, currentPosition.lng),
-              new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
-            );
-            playerPosition.setPosition(currentPosition);
-            basketMarker.setOptions({
-              label: new google.maps.Marker({
-                text: `${Math.round(playerDistance / 0.3048)} ft`,
-                color: 'orange',
-                fontWeight: 'bold',
-              }),
-            });
-            playerPath.setPath([
-              basketMarker.position,
-              playerPosition.position,
-            ]);
-            playerPath.setMap(map);
-            // bounds.extend(currentPosition);
-            // map.fitBounds(bounds);
-          },
-          error,
-          {
-            enableHighAccuracy: true,
-          }
-        );
-      }
-
-      bounds.extend(basketMarker.position);
-      bounds.extend(teeMarker.position);
+      bounds.extend(activeBasketMarker.position);
+      bounds.extend(activeTeeMarker.position);
       map.fitBounds(bounds);
 
-      var lineSymbol = {
-        path: 'M 0,-1 0,1',
-        strokeOpacity: 1,
-        scale: 4,
-      };
+      courseData.holes.map((hole) => {
+        const activeHole = courseData.holes.indexOf(hole) === activeStep;
+        const lineSymbol = {
+          path: 'M 0,-1 0,1',
+          strokeOpacity: activeHole ? 1 : 0.5,
+          scale: 4,
+        };
+        const teePosition = { lat: hole.tee[0], lng: hole.tee[1] };
+        const basketPosition = { lat: hole.basket[0], lng: hole.basket[1] };
 
-      const flightPath = new google.maps.Polyline({
-        path: [basketMarker.position, teeMarker.position],
-        geodesic: true,
-        strokeColor: 'white',
-        strokeOpacity: 0,
-        strokeWeight: 4,
-        icons: [
-          {
-            icon: lineSymbol,
-            offset: '0',
-            repeat: '20px',
-          },
-        ],
+        const distance = google.maps.geometry.spherical.computeDistanceBetween(
+          new google.maps.LatLng(teePosition.lat, teePosition.lng),
+          new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
+        );
+
+        setHoleDistance(distance);
+
+        const teeMarker = new google.maps.Marker({
+          position: teePosition,
+          icon: icons.tee.icon,
+          map: map,
+          label: new google.maps.Marker({
+            text: `${courseData.holes.indexOf(hole) + 1} - ${Math.round(
+              distance / 0.3048
+            )} ft`,
+            color: activeHole ? 'white' : 'grey',
+            fontWeight: 'bold',
+          }),
+          animation: google.maps.Animation.DROP,
+        });
+
+        const basketMarker = new google.maps.Marker({
+          position: basketPosition,
+          icon: icons.basket.icon,
+          map: map,
+          animation: google.maps.Animation.DROP,
+        });
+
+        playerPosition = new google.maps.Marker({
+          icon: icons.minion.icon,
+          map: map,
+          animation: google.maps.Animation.DROP,
+        });
+
+        const playerPath = new google.maps.Polyline({
+          geodesic: true,
+          strokeColor: '#659DBD',
+          strokeOpacity: 0,
+          strokeWeight: 4,
+          icons: [
+            {
+              icon: { path: 'M 0,-1 0,1', strokeOpacity: 0.5, scale: 4 },
+              offset: '0',
+              repeat: '20px',
+            },
+          ],
+        });
+
+        function error(err) {
+          console.warn('ERROR(' + err.code + '): ' + err.message);
+        }
+
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+          navigator.geolocation.watchPosition(
+            (position) => {
+              currentPosition = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+              playerDistance = google.maps.geometry.spherical.computeDistanceBetween(
+                new google.maps.LatLng(
+                  currentPosition.lat,
+                  currentPosition.lng
+                ),
+                new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
+              );
+              playerPosition.setPosition(currentPosition);
+              activeBasketMarker.setOptions({
+                label: new google.maps.Marker({
+                  text: `${Math.round(playerDistance / 0.3048)} ft`,
+                  color: 'orange',
+                  fontWeight: 'bold',
+                }),
+              });
+              playerPath.setPath([
+                activeBasketMarker.position,
+                playerPosition.position,
+              ]);
+              playerPath.setMap(map);
+              // bounds.extend(currentPosition);
+              // map.fitBounds(bounds);
+            },
+            error,
+            {
+              enableHighAccuracy: true,
+            }
+          );
+        }
+
+        const flightPath = new google.maps.Polyline({
+          path: [basketMarker.position, teeMarker.position],
+          geodesic: true,
+          strokeColor: activeHole ? 'white' : 'yellow',
+          strokeOpacity: 0,
+          icons: [
+            {
+              icon: lineSymbol,
+              offset: '0',
+              repeat: '20px',
+            },
+          ],
+        });
+
+        flightPath.setMap(map);
       });
-
-      flightPath.setMap(map);
     }
   }, [courseData, activeStep]);
 
