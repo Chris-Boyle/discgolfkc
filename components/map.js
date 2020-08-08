@@ -60,6 +60,8 @@ export default function Map({ courseData }) {
     setThrows('');
   };
 
+  let map;
+
   React.useEffect(() => {
     if (!!google) {
       const icons = {
@@ -114,17 +116,19 @@ export default function Map({ courseData }) {
         animation: google.maps.Animation.DROP,
       });
 
-      const map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 20, // overriden by bounds
-        mapTypeId: 'satellite',
-        disableDefaultUI: true, // a way to quickly hide all controls
-        mapTypeControl: true,
-        scaleControl: true,
-        zoomControl: true,
-        zoomControlOptions: {
-          style: google.maps.ZoomControlStyle.LARGE,
-        },
-      });
+      if (!map) {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 20, // overriden by bounds
+          mapTypeId: 'satellite',
+          disableDefaultUI: true, // a way to quickly hide all controls
+          mapTypeControl: true,
+          scaleControl: true,
+          zoomControl: true,
+          zoomControlOptions: {
+            style: google.maps.ZoomControlStyle.LARGE,
+          },
+        });
+      }
 
       const bounds = new google.maps.LatLngBounds();
       bounds.extend(activeBasketMarker.position);
@@ -146,8 +150,9 @@ export default function Map({ courseData }) {
           new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
         );
 
-        setHoleDistance(distance);
-
+        if (activeHole) {
+          setHoleDistance(Math.round(distance / 0.3048));
+        }
         const teeMarker = new google.maps.Marker({
           position: teePosition,
           icon: icons.tee.icon,
@@ -156,7 +161,7 @@ export default function Map({ courseData }) {
             text: `${courseData.holes.indexOf(hole) + 1} - ${Math.round(
               distance / 0.3048
             )} ft`,
-            color: activeHole ? 'white' : 'grey',
+            color: activeHole ? 'white' : 'yellow',
             fontWeight: 'bold',
           }),
           animation: google.maps.Animation.DROP,
@@ -268,7 +273,7 @@ export default function Map({ courseData }) {
           <TextField
             id='distance'
             label='Distance'
-            value={`${Math.round(holeDistance / 0.3048)} ft`}
+            value={`${holeDistance} ft`}
             InputProps={{
               readOnly: true,
             }}
