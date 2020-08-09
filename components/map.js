@@ -83,6 +83,7 @@ export default function Map({ courseData }) {
           icon: {
             url: '/images/minion.png',
             labelOrigin: new google.maps.Point(20, 30),
+            scaledSize: new google.maps.Size(20, 20),
           },
         },
       };
@@ -214,7 +215,7 @@ export default function Map({ courseData }) {
                 new google.maps.LatLng(basketPosition.lat, basketPosition.lng)
               );
               playerPosition.setPosition(currentPosition);
-              activeBasketMarker.setOptions({
+              playerPosition.setOptions({
                 label: new google.maps.Marker({
                   text: `${Math.round(playerDistance / 0.3048)} ft`,
                   color: 'orange',
