@@ -1,10 +1,10 @@
 ## Disc Golf KC
 
-This is the nextjs app for [Disc Golf KC](https://discgolfkc.vercel.app/).
+This is the nextjs app for Disc Golf KC. [https://discgolfkc.vercel.app/](https://discgolfkc.vercel.app/).
 
 This is a project to showcase all of the great disc golf courses around the city.
 
-It uses the Google API to show maps of the course.
+It uses the Google API to show maps of the course. and shot distances using real-time GPS from your device and the tee/backet markers.
 
 #### Videos
 

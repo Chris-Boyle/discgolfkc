@@ -1,5 +1,5 @@
 import React from 'react';
-import {makeStyles, useTheme} from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import MobileStepper from '@material-ui/core/MobileStepper';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -37,13 +37,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Map({courseData}) {
+export default function Map({ courseData }) {
   const classes = useStyles();
   const theme = useTheme();
+
   const [activeStep, setActiveStep] = React.useState(0);
   const [totalThrows, settotalThrows] = React.useState(0);
-  const [throws, setThrows] = React.useState();
-  const [activeHole, setActiveHole] = React.useState(false);
+  const [throws, setThrows] = React.useState(0);
   const [holeDistance, setHoleDistance] = React.useState(0);
   const [activeBasketPosition, setActiveBasketPosition] = React.useState();
   const [googleMap, setGoogleMap] = React.useState();
@@ -79,10 +79,11 @@ export default function Map({courseData}) {
     scale: 4,
   };
 
-
   // Set the map with the valid Google map object
   React.useEffect(() => {
-    if (!google) {return }
+    if (!google) {
+      return;
+    }
     if (!googleMap) {
       const map = new google.maps.Map(document.getElementById('map'), {
         zoom: 20, // overriden by bounds
@@ -120,9 +121,8 @@ export default function Map({courseData}) {
     };
 
     courseData.holes.map((hole) => {
-      setActiveHole(courseData.holes.indexOf(hole) === activeStep);
-      const teePosition = {lat: hole.tee[0], lng: hole.tee[1]};
-      const basketPosition = {lat: hole.basket[0], lng: hole.basket[1]};
+      const teePosition = { lat: hole.tee[0], lng: hole.tee[1] };
+      const basketPosition = { lat: hole.basket[0], lng: hole.basket[1] };
 
       const distance = google.maps.geometry.spherical.computeDistanceBetween(
         new google.maps.LatLng(teePosition.lat, teePosition.lng),
@@ -165,10 +165,11 @@ export default function Map({courseData}) {
     });
   }, [googleMap]);
 
-
   // Set the initial player object and position
   const playerPosition = React.useMemo(() => {
-    if (!googleMap) {return };
+    if (!googleMap) {
+      return;
+    }
     const minion = {
       icon: {
         url: '/images/minion.png',
@@ -181,12 +182,14 @@ export default function Map({courseData}) {
       icon: minion.icon,
       map: googleMap,
       animation: google.maps.Animation.DROP,
-    })
+    });
   }, [googleMap]);
 
   // et the initial player path attributes
   const playerPath = React.useMemo(() => {
-    if (!googleMap) {return };
+    if (!googleMap) {
+      return;
+    }
     new google.maps.Polyline({
       geodesic: true,
       strokeColor: '#659DBD',
@@ -194,16 +197,18 @@ export default function Map({courseData}) {
       strokeWeight: 4,
       icons: [
         {
-          icon: {path: 'M 0,-1 0,1', strokeOpacity: 0.5, scale: 4},
+          icon: { path: 'M 0,-1 0,1', strokeOpacity: 0.5, scale: 4 },
           offset: '0',
           repeat: '20px',
         },
       ],
-    })
+    });
   }, [googleMap]);
 
   const icons = React.useMemo(() => {
-    if (!googleMap) {return };
+    if (!googleMap) {
+      return;
+    }
     return {
       basket: {
         icon: {
@@ -218,8 +223,8 @@ export default function Map({courseData}) {
           labelOrigin: new google.maps.Point(20, 30),
           scaledSize: new google.maps.Size(20, 20),
         },
-      }
-    }
+      },
+    };
   }, [googleMap]);
 
   React.useEffect(() => {
@@ -228,8 +233,6 @@ export default function Map({courseData}) {
     }
     // Try HTML5 geolocation.
     if (navigator.geolocation && !!activeBasketPosition && playerPosition) {
-
-
       navigator.geolocation.watchPosition(
         (position) => {
           const currentPosition = {
@@ -297,7 +300,6 @@ export default function Map({courseData}) {
     setHoleDistance(Math.round(distance / 0.3048));
 
     if (googleMap) {
-
       const activeTeeMarker = new google.maps.Marker({
         position: activeTeePosition,
         icon: icons.tee.icon,
@@ -391,7 +393,7 @@ export default function Map({courseData}) {
       <Paper square elevation={0} className={classes.header}>
         <Typography> Hole {activeStep + 1}</Typography>
       </Paper>
-      <div id='map' style={{height: '25rem'}} />
+      <div id='map' style={{ height: '25rem' }} />
       <MobileStepper
         steps={maxSteps}
         position='static'
@@ -409,8 +411,8 @@ export default function Map({courseData}) {
             {theme.direction === 'rtl' ? (
               <KeyboardArrowLeft />
             ) : (
-                <KeyboardArrowRight />
-              )}
+              <KeyboardArrowRight />
+            )}
           </Button>
         }
         backButton={
@@ -423,8 +425,8 @@ export default function Map({courseData}) {
             {theme.direction === 'rtl' ? (
               <KeyboardArrowRight />
             ) : (
-                <KeyboardArrowLeft />
-              )}
+              <KeyboardArrowLeft />
+            )}
             Back
           </Button>
         }
