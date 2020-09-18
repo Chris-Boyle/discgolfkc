@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import {makeStyles, useTheme} from '@material-ui/core/styles';
 import MobileStepper from '@material-ui/core/MobileStepper';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Map({ courseData }) {
+export default function Map({courseData}) {
   const classes = useStyles();
   const theme = useTheme();
   const [activeStep, setActiveStep] = React.useState(0);
@@ -79,28 +79,28 @@ export default function Map({ courseData }) {
     scale: 4,
   };
 
-  let map, playerPosition;
 
+  // Set the map with the valid Google map object
   React.useEffect(() => {
-    if (!!google) {
-      if (!googleMap) {
-        const map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 20, // overriden by bounds
-          mapTypeId: 'satellite',
-          disableDefaultUI: true, // a way to quickly hide all controls
-          mapTypeControl: true,
-          scaleControl: true,
-          zoomControl: true,
-          fullscreenControl: true,
-          zoomControlOptions: {
-            style: google.maps.ZoomControlStyle.LARGE,
-          },
-        });
-        setGoogleMap(map);
-      }
+    if (!google) {return }
+    if (!googleMap) {
+      const map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 20, // overriden by bounds
+        mapTypeId: 'satellite',
+        disableDefaultUI: true, // a way to quickly hide all controls
+        mapTypeControl: true,
+        scaleControl: true,
+        zoomControl: true,
+        fullscreenControl: true,
+        zoomControlOptions: {
+          style: google.maps.ZoomControlStyle.LARGE,
+        },
+      });
+      setGoogleMap(map);
     }
   }, [courseData, activeStep]);
 
+  // Sets the flight path for all holes when we have a valid googleMap object
   React.useEffect(() => {
     const icons = {
       basket: {
@@ -120,10 +120,9 @@ export default function Map({ courseData }) {
     };
 
     courseData.holes.map((hole) => {
-      const activeHole = courseData.holes.indexOf(hole) === activeStep;
-      setActiveHole(activeHole);
-      const teePosition = { lat: hole.tee[0], lng: hole.tee[1] };
-      const basketPosition = { lat: hole.basket[0], lng: hole.basket[1] };
+      setActiveHole(courseData.holes.indexOf(hole) === activeStep);
+      const teePosition = {lat: hole.tee[0], lng: hole.tee[1]};
+      const basketPosition = {lat: hole.basket[0], lng: hole.basket[1]};
 
       const distance = google.maps.geometry.spherical.computeDistanceBetween(
         new google.maps.LatLng(teePosition.lat, teePosition.lng),
@@ -166,39 +165,70 @@ export default function Map({ courseData }) {
     });
   }, [googleMap]);
 
+
+  // Set the initial player object and position
+  const playerPosition = React.useMemo(() => {
+    if (!googleMap) {return };
+    const minion = {
+      icon: {
+        url: '/images/minion.png',
+        labelOrigin: new google.maps.Point(20, 30),
+        scaledSize: new google.maps.Size(20, 20),
+      },
+    };
+
+    new google.maps.Marker({
+      icon: minion.icon,
+      map: googleMap,
+      animation: google.maps.Animation.DROP,
+    })
+  }, [googleMap]);
+
+  // et the initial player path attributes
+  const playerPath = React.useMemo(() => {
+    if (!googleMap) {return };
+    new google.maps.Polyline({
+      geodesic: true,
+      strokeColor: '#659DBD',
+      strokeOpacity: 0,
+      strokeWeight: 4,
+      icons: [
+        {
+          icon: {path: 'M 0,-1 0,1', strokeOpacity: 0.5, scale: 4},
+          offset: '0',
+          repeat: '20px',
+        },
+      ],
+    })
+  }, [googleMap]);
+
+  const icons = React.useMemo(() => {
+    if (!googleMap) {return };
+    return {
+      basket: {
+        icon: {
+          url: '/images/yelllow-basket.png',
+          labelOrigin: new google.maps.Point(20, 50),
+          scaledSize: new google.maps.Size(20, 20),
+        },
+      },
+      tee: {
+        icon: {
+          url: '/images/red-thrower.png',
+          labelOrigin: new google.maps.Point(20, 30),
+          scaledSize: new google.maps.Size(20, 20),
+        },
+      }
+    }
+  }, [googleMap]);
+
   React.useEffect(() => {
     function error(err) {
       console.warn('ERROR(' + err.code + '): ' + err.message);
     }
-
     // Try HTML5 geolocation.
-    if (navigator.geolocation && !!activeBasketPosition) {
-      const minion = {
-        icon: {
-          url: '/images/minion.png',
-          labelOrigin: new google.maps.Point(20, 30),
-          scaledSize: new google.maps.Size(20, 20),
-        },
-      };
-      const playerPath = new google.maps.Polyline({
-        geodesic: true,
-        strokeColor: '#659DBD',
-        strokeOpacity: 0,
-        strokeWeight: 4,
-        icons: [
-          {
-            icon: { path: 'M 0,-1 0,1', strokeOpacity: 0.5, scale: 4 },
-            offset: '0',
-            repeat: '20px',
-          },
-        ],
-      });
+    if (navigator.geolocation && !!activeBasketPosition && playerPosition) {
 
-      playerPosition = new google.maps.Marker({
-        icon: minion.icon,
-        map: googleMap,
-        animation: google.maps.Animation.DROP,
-      });
 
       navigator.geolocation.watchPosition(
         (position) => {
@@ -230,8 +260,9 @@ export default function Map({ courseData }) {
         }
       );
     }
-  }, [activeBasketPosition]);
+  }, [activeBasketPosition, playerPosition]);
 
+  // Update flight path, player position, active basket
   React.useEffect(() => {
     if (activeFlightPath) {
       activeFlightPath.setOptions({
@@ -262,25 +293,10 @@ export default function Map({ courseData }) {
       new google.maps.LatLng(activeBasketPosition.lat, activeBasketPosition.lng)
     );
 
+    //convert yards to feet
     setHoleDistance(Math.round(distance / 0.3048));
 
     if (googleMap) {
-      const icons = {
-        basket: {
-          icon: {
-            url: '/images/yelllow-basket.png',
-            labelOrigin: new google.maps.Point(20, 50),
-            scaledSize: new google.maps.Size(20, 20),
-          },
-        },
-        tee: {
-          icon: {
-            url: '/images/red-thrower.png',
-            labelOrigin: new google.maps.Point(20, 30),
-            scaledSize: new google.maps.Size(20, 20),
-          },
-        },
-      };
 
       const activeTeeMarker = new google.maps.Marker({
         position: activeTeePosition,
@@ -375,7 +391,7 @@ export default function Map({ courseData }) {
       <Paper square elevation={0} className={classes.header}>
         <Typography> Hole {activeStep + 1}</Typography>
       </Paper>
-      <div id='map' style={{ height: '25rem' }} />
+      <div id='map' style={{height: '25rem'}} />
       <MobileStepper
         steps={maxSteps}
         position='static'
@@ -393,8 +409,8 @@ export default function Map({ courseData }) {
             {theme.direction === 'rtl' ? (
               <KeyboardArrowLeft />
             ) : (
-              <KeyboardArrowRight />
-            )}
+                <KeyboardArrowRight />
+              )}
           </Button>
         }
         backButton={
@@ -407,8 +423,8 @@ export default function Map({ courseData }) {
             {theme.direction === 'rtl' ? (
               <KeyboardArrowRight />
             ) : (
-              <KeyboardArrowLeft />
-            )}
+                <KeyboardArrowLeft />
+              )}
             Back
           </Button>
         }
